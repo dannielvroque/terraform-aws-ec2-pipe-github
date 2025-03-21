@@ -1,0 +1,36 @@
+name: Destroy AWS Resources
+
+on:
+  workflow_dispatch:  # Permite executar manualmente
+  pull_request:
+    types:
+      - closed  # Executa quando um PR é fechado
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar credenciais da AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Substitua pela sua região
+
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Destruir recursos com Terraform
+        run: |
+          terraform init
+          terraform destroy -auto-approve
+        working-directory: terraform/  # Ajuste para a pasta onde está o código do Terraform
+
+      - name: Deletar um recurso AWS CLI (Exemplo EC2)
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Terraform-EC2" --query "Reservations[*].Instances[*].InstanceId" --output text)
+          if [ -n "$INSTANCE_ID" ]; then
+            aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+          else
+            echo "Nenhuma instância encontrada."
+          fi
