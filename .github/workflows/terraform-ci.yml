@@ -62,8 +62,5 @@ jobs:
       - name: Validar Terraform
         run: terraform validate
 
-      - name: Destruir recursos em us-east-1
-        run: terraform destroy -auto-approve
-
-      - name: Destruir recursos em sa-east-1
+      - name: Destruir recursos em SA e US
         run: terraform destroy -auto-approve
