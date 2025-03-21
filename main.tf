@@ -82,6 +82,7 @@ resource "aws_security_group" "sg_sa" {
   }
 }
 
+# Instância para us-east-1
 resource "aws_instance" "us" {
   provider      = aws.useast
   ami           = var.regions["us-east-1"]
@@ -90,6 +91,7 @@ resource "aws_instance" "us" {
   vpc_security_group_ids = [aws_security_group.sg_us.id]
 }
 
+# Instância para sa-east-1
 resource "aws_instance" "sa" {
   provider      = aws.saeast
   ami           = var.regions["sa-east-1"]
