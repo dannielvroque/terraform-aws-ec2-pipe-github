@@ -40,7 +40,7 @@ jobs:
   terraform_destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' # Só rodar o destroy se for disparado manualmente
+    if: github.event_name == 'workflow_dispatch'  # Só rodar o destroy se for disparado manualmente
 
     steps:
       - name: Checkout do código
@@ -62,9 +62,8 @@ jobs:
       - name: Validar Terraform
         run: terraform validate
 
-      - name: Destruir recursos em us-east-1 (todas as AZs)
-        run: terraform destroy -auto-approve -target=aws_vpc.vpc_us -target=aws_subnet.subnet_us_a -target=aws_subnet.subnet_us_c -target=aws_instance.us_a -target=aws_instance.us_c -target=aws_security_group.sg_us
-      
-      - name: Destruir recursos em sa-east-1 (todas as AZs)
-        run: terraform destroy -auto-approve -target=aws_vpc.vpc_sa -target=aws_subnet.subnet_sa_a -target=aws_subnet.subnet_sa_c -target=aws_instance.sa_a -target=aws_instance.sa_c -target=aws_security_group.sg_sa
-      
+      - name: Destruir recursos em us-east-1
+        run: terraform destroy -auto-approve
+
+      - name: Destruir recursos em sa-east-1
+        run: terraform destroy -auto-approve
