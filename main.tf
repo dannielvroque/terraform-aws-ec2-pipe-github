@@ -6,139 +6,107 @@ variable "regions" {
   }
 }
 
+variable "vpc_cidr" {
+  type = map(string)
+  default = {
+    "us-east-1" = "10.0.0.0/16"
+    "sa-east-1" = "10.1.0.0/16"
+  }
+}
+
+# Provvedor para a região us-east-1
 provider "aws" {
   alias  = "useast"
   region = "us-east-1"
 }
 
+# Provvedor para a região sa-east-1
 provider "aws" {
   alias  = "saeast"
   region = "sa-east-1"
 }
 
-# VPC para us-east-1
-resource "aws_vpc" "vpc_us" {
-  provider   = aws.useast
-  cidr_block = "10.0.0.0/16"
+# Módulos de VPC
+module "vpc_us" {
+  source     = "./modules/vpc"
+  providers  = { aws = aws.useast }
+  cidr_block = var.vpc_cidr["us-east-1"]
 }
 
-resource "aws_subnet" "subnet_us_a" {
-  provider   = aws.useast
-  vpc_id     = aws_vpc.vpc_us.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+module "vpc_sa" {
+  source     = "./modules/vpc"
+  providers  = { aws = aws.saeast }
+  cidr_block = var.vpc_cidr["sa-east-1"]
 }
 
-resource "aws_subnet" "subnet_us_c" {
-  provider   = aws.useast
-  vpc_id     = aws_vpc.vpc_us.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "us-east-1c"
+# Módulos de Subnet
+module "subnet_us" {
+  source    = "./modules/subnet"
+  providers = { aws = aws.useast }
+  vpc_id    = module.vpc_us.vpc_id
 }
 
-# VPC para sa-east-1
-resource "aws_vpc" "vpc_sa" {
-  provider   = aws.saeast
-  cidr_block = "10.1.0.0/16"
+module "subnet_sa" {
+  source    = "./modules/subnet"
+  providers = { aws = aws.saeast }
+  vpc_id    = module.vpc_sa.vpc_id
 }
 
-resource "aws_subnet" "subnet_sa_a" {
-  provider   = aws.saeast
-  vpc_id     = aws_vpc.vpc_sa.id
-  cidr_block = "10.1.1.0/24"
-  availability_zone = "sa-east-1a"
+# Módulos de Security Group
+module "sg_us" {
+  source    = "./modules/security_group"
+  providers = { aws = aws.useast }
+  vpc_id    = module.vpc_us.vpc_id
 }
 
-resource "aws_subnet" "subnet_sa_c" {
-  provider   = aws.saeast
-  vpc_id     = aws_vpc.vpc_sa.id
-  cidr_block = "10.1.2.0/24"
-  availability_zone = "sa-east-1c"
+module "sg_sa" {
+  source    = "./modules/security_group"
+  providers = { aws = aws.saeast }
+  vpc_id    = module.vpc_sa.vpc_id
 }
 
-# Security Group para us-east-1
-resource "aws_security_group" "sg_us" {
-  provider = aws.useast
-  vpc_id   = aws_vpc.vpc_us.id
-  name     = "allow_ssh_ping"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Security Group para sa-east-1
-resource "aws_security_group" "sg_sa" {
-  provider = aws.saeast
-  vpc_id   = aws_vpc.vpc_sa.id
-  name     = "allow_ssh_ping"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Instância para us-east-1 na zona "us-east-1a"
-resource "aws_instance" "us_a" {
-  provider      = aws.useast
-  ami           = var.regions["us-east-1"]
+# Módulos de EC2 Instances
+module "ec2_instance_us_a" {
+  source        = "./modules/ec2_instance"
+  providers     = { aws = aws.useast }
+  ami_id        = var.regions["us-east-1"]
   instance_type = "t2.micro"
-  subnet_id     = aws_subnet.subnet_us_a.id
-  vpc_security_group_ids = [aws_security_group.sg_us.id]
+  subnet_id     = module.subnet_us.subnet_id
+  security_group_ids = [module.sg_us.sg_id]
 }
 
-# Instância para us-east-1 na zona "us-east-1c"
-resource "aws_instance" "us_c" {
-  provider      = aws.useast
-  ami           = var.regions["us-east-1"]
+module "ec2_instance_us_c" {
+  source        = "./modules/ec2_instance"
+  providers     = { aws = aws.useast }
+  ami_id        = var.regions["us-east-1"]
   instance_type = "t2.micro"
-  subnet_id     = aws_subnet.subnet_us_c.id
-  vpc_security_group_ids = [aws_security_group.sg_us.id]
+  subnet_id     = module.subnet_us.subnet_id
+  security_group_ids = [module.sg_us.sg_id]
 }
 
-# Instância para sa-east-1 na zona "sa-east-1a"
-resource "aws_instance" "sa_a" {
-  provider      = aws.saeast
-  ami           = var.regions["sa-east-1"]
+module "ec2_instance_sa_a" {
+  source        = "./modules/ec2_instance"
+  providers     = { aws = aws.saeast }
+  ami_id        = var.regions["sa-east-1"]
   instance_type = "t2.micro"
-  subnet_id     = aws_subnet.subnet_sa_a.id
-  vpc_security_group_ids = [aws_security_group.sg_sa.id]
+  subnet_id     = module.subnet_sa.subnet_id
+  security_group_ids = [module.sg_sa.sg_id]
 }
 
-# Instância para sa-east-1 na zona "sa-east-1c"
-resource "aws_instance" "sa_c" {
-  provider      = aws.saeast
-  ami           = var.regions["sa-east-1"]
+module "ec2_instance_sa_c" {
+  source        = "./modules/ec2_instance"
+  providers     = { aws = aws.saeast }
+  ami_id        = var.regions["sa-east-1"]
   instance_type = "t2.micro"
-  subnet_id     = aws_subnet.subnet_sa_c.id
-  vpc_security_group_ids = [aws_security_group.sg_sa.id]
+  subnet_id     = module.subnet_sa.subnet_id
+  security_group_ids = [module.sg_sa.sg_id]
 }
 
 output "instance_ips" {
   value = {
-    us-east-1a = aws_instance.us_a.public_ip
-    us-east-1c = aws_instance.us_c.public_ip
-    sa-east-1a = aws_instance.sa_a.public_ip
-    sa-east-1c = aws_instance.sa_c.public_ip
+    us-east-1a = module.ec2_instance_us_a.public_ip
+    us-east-1c = module.ec2_instance_us_c.public_ip
+    sa-east-1a = module.ec2_instance_sa_a.public_ip
+    sa-east-1c = module.ec2_instance_sa_c.public_ip
   }
 }
