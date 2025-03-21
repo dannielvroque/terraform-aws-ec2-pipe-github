@@ -5,9 +5,10 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch: # Para permitir a execução manual do destroy
 
 jobs:
-  terraform:
+  terraform_apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
 
@@ -34,3 +35,31 @@ jobs:
       - name: Aplicar Terraform
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
+
+  terraform_destroy:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' # Só rodar o destroy se for disparado manualmente
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Inicializar Terraform
+        run: terraform init
+
+      - name: Validar Terraform
+        run: terraform validate
+
+      - name: Destruir Terraform
+        run: terraform destroy -auto-approve
