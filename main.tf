@@ -16,16 +16,86 @@ provider "aws" {
   region = "sa-east-1"
 }
 
+# VPC para us-east-1
+resource "aws_vpc" "vpc_us" {
+  provider   = aws.useast
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "subnet_us" {
+  provider   = aws.useast
+  vpc_id     = aws_vpc.vpc_us.id
+  cidr_block = "10.0.1.0/24"
+}
+
+# VPC para sa-east-1
+resource "aws_vpc" "vpc_sa" {
+  provider   = aws.saeast
+  cidr_block = "10.1.0.0/16"
+}
+
+resource "aws_subnet" "subnet_sa" {
+  provider   = aws.saeast
+  vpc_id     = aws_vpc.vpc_sa.id
+  cidr_block = "10.1.1.0/24"
+}
+
+# Security Group para us-east-1
+resource "aws_security_group" "sg_us" {
+  provider = aws.useast
+  vpc_id   = aws_vpc.vpc_us.id
+  name     = "allow_ssh_ping"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Security Group para sa-east-1
+resource "aws_security_group" "sg_sa" {
+  provider = aws.saeast
+  vpc_id   = aws_vpc.vpc_sa.id
+  name     = "allow_ssh_ping"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_instance" "us" {
   provider      = aws.useast
   ami           = var.regions["us-east-1"]
   instance_type = "t2.micro"
+  subnet_id     = aws_subnet.subnet_us.id
+  vpc_security_group_ids = [aws_security_group.sg_us.id]
 }
 
 resource "aws_instance" "sa" {
   provider      = aws.saeast
   ami           = var.regions["sa-east-1"]
   instance_type = "t2.micro"
+  subnet_id     = aws_subnet.subnet_sa.id
+  vpc_security_group_ids = [aws_security_group.sg_sa.id]
 }
 
 output "instance_ips" {
