@@ -102,7 +102,7 @@ resource "aws_security_group" "sg_sa" {
 resource "aws_instance" "us_a" {
   provider      = aws.useast
   ami           = var.regions["us-east-1"]
-  instance_type = "t2.micro"
+  instance_type = "t2.xlarge"
   subnet_id     = aws_subnet.subnet_us_a.id
   vpc_security_group_ids = [aws_security_group.sg_us.id]
 }
