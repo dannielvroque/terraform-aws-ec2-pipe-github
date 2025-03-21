@@ -8,7 +8,9 @@ on:
 
 jobs:
   destroy:
+    name: Terraform Destroy
     runs-on: ubuntu-latest
+
     steps:
       - name: Configurar credenciais da AWS
         uses: aws-actions/configure-aws-credentials@v2
@@ -22,7 +24,6 @@ jobs:
 
       - name: Destruir recursos com Terraform
         run: |
-          terraform init
           terraform destroy -auto-approve
         working-directory: terraform/  # Ajuste para a pasta onde está o código do Terraform
 
