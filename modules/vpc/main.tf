@@ -6,11 +6,6 @@ terraform {
   }
 }
 
-# Declaração do provedor para ser configurado no módulo pai
-provider "aws" {
-  region = var.region  # A região será passada do módulo principal
-}
-
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
 }

@@ -6,10 +6,6 @@ terraform {
   }
 }
 
-# Definindo o provedor AWS para o módulo
-provider "aws" {
-  region = var.region  # A região será passada do módulo principal
-}
 
 resource "aws_instance" "instance" {
   ami                    = var.ami_id

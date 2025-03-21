@@ -6,11 +6,6 @@ terraform {
   }
 }
 
-# Definindo o provedor AWS para o módulo
-provider "aws" {
-  region = var.region  # A região será passada do módulo principal
-}
-
 resource "aws_security_group" "sg" {
   vpc_id = var.vpc_id
   name   = var.security_group_name
