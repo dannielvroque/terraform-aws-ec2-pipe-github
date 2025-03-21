@@ -115,11 +115,12 @@ resource "aws_s3_bucket" "terraform_state" {
 
 
 terraform {
-  backend "s3" {
-    bucket = "s3-tfsate-danniel1"     # Nome do seu bucket
-    key    = "terraform.tfstate"     # Caminho do arquivo de estado dentro do bucket
-    region = "us-east-1"             # Região onde o bucket está localizado
-    encrypt = true                   # Habilita criptografia do estado no S3
-    acl    = "private"               # Controle de acesso ao arquivo de estado
-  }
+  # backend "s3" {
+  #   bucket = "s3-tfsate-danniel1" 
+  #   key    = "terraform.tfstate"
+  #   region = "us-east-1"
+  #   encrypt = true
+  #   acl    = "private"
+  # }
 }
+
