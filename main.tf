@@ -106,3 +106,20 @@ output "instance_ips" {
     sa-east-1 = aws_instance.sa.public_ip
   }
 }
+
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "s3-tfsate-danniel1"
+  acl    = "private"
+  region = "us-east-1"  # Região do bucket
+}
+
+
+terraform {
+  backend "s3" {
+    bucket = "s3-tfsate-danniel1"     # Nome do seu bucket
+    key    = "terraform.tfstate"     # Caminho do arquivo de estado dentro do bucket
+    region = "us-east-1"             # Região onde o bucket está localizado
+    encrypt = true                   # Habilita criptografia do estado no S3
+    acl    = "private"               # Controle de acesso ao arquivo de estado
+  }
+}
