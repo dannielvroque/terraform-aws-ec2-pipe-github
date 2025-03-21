@@ -6,27 +6,31 @@ variable "regions" {
   }
 }
 
-# Definir múltiplos providers com alias
 provider "aws" {
-  alias  = "us-east-1"
+  alias  = "useast"
   region = "us-east-1"
 }
 
 provider "aws" {
-  alias  = "sa-east-1"
+  alias  = "saeast"
   region = "sa-east-1"
 }
 
-# Criar instâncias dinamicamente
-resource "aws_instance" "instances" {
-  for_each      = var.regions
-  provider      = each.key == "us-east-1" ? aws.us-east-1 : aws.sa-east-1
-
-  ami           = each.value
+resource "aws_instance" "us" {
+  provider      = aws.useast
+  ami           = var.regions["us-east-1"]
   instance_type = "t2.micro"
 }
 
-# Output para exibir os IPs públicos das instâncias criadas
+resource "aws_instance" "sa" {
+  provider      = aws.saeast
+  ami           = var.regions["sa-east-1"]
+  instance_type = "t2.micro"
+}
+
 output "instance_ips" {
-  value = { for region, instance in aws_instance.instances : region => instance.public_ip }
+  value = {
+    us-east-1 = aws_instance.us.public_ip
+    sa-east-1 = aws_instance.sa.public_ip
+  }
 }
