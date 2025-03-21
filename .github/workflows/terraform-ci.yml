@@ -11,6 +11,7 @@ jobs:
   terraform_apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' # Garantir que o apply seja apenas no push
 
     steps:
       - name: Checkout do código
@@ -33,7 +34,7 @@ jobs:
         run: terraform validate
 
       - name: Aplicar Terraform
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' # Aplica apenas quando há push para a branch main
         run: terraform apply -auto-approve
 
   terraform_destroy:
