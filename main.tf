@@ -108,19 +108,22 @@ output "instance_ips" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "s3-tfsate-danniel1"
+  bucket = "s3-tfsate-danniel1"  # Nome do bucket
+  # Remova a linha abaixo, pois a região será definida pelo provider
+  # region = "us-east-1"  
+}
+
+resource "aws_s3_bucket_acl" "terraform_state_acl" {
+  bucket = aws_s3_bucket.terraform_state.bucket
   acl    = "private"
-  region = "us-east-1"  # Região do bucket
 }
 
-
-terraform {
-  # backend "s3" {
-  #   bucket = "s3-tfsate-danniel1" 
-  #   key    = "terraform.tfstate"
-  #   region = "us-east-1"
-  #   encrypt = true
-  #   acl    = "private"
-  # }
-}
+# terraform {
+#   backend "s3" {
+#     bucket = "s3-tfsate-danniel1"
+#     key    = "terraform.tfstate"
+#     region = "us-east-1"  # A região agora está sendo configurada no provider, sem necessidade no backend
+#     encrypt = true
+#   }
+# }
 
