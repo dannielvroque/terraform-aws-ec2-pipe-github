@@ -1,5 +1,14 @@
-variable "cidr_block" {
-  type = string
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
+# Declaração do provedor para ser configurado no módulo pai
+provider "aws" {
+  region = var.region  # A região será passada do módulo principal
 }
 
 resource "aws_vpc" "vpc" {

@@ -30,46 +30,67 @@ provider "aws" {
 module "vpc_us" {
   source     = "./modules/vpc"
   providers  = { aws = aws.useast }
+  region     = "us-east-1"  # Passa explicitamente a região
   cidr_block = var.vpc_cidr["us-east-1"]
 }
 
 module "vpc_sa" {
   source     = "./modules/vpc"
   providers  = { aws = aws.saeast }
+  region     = "sa-east-1"  # Passa explicitamente a região
   cidr_block = var.vpc_cidr["sa-east-1"]
 }
 
 # Módulos de Subnet
 module "subnet_us" {
-  source    = "./modules/subnet"
-  providers = { aws = aws.useast }
-  vpc_id    = module.vpc_us.vpc_id
+  source              = "./modules/subnet"
+  providers           = { aws = aws.useast }
+  vpc_id             = module.vpc_us.vpc_id
+  region             = "us-east-1"
+  cidr_block_a       = "10.0.1.0/24"
+  cidr_block_c       = "10.0.2.0/24"
+  availability_zone_a = "us-east-1a"
+  availability_zone_c = "us-east-1c"
 }
 
 module "subnet_sa" {
-  source    = "./modules/subnet"
-  providers = { aws = aws.saeast }
-  vpc_id    = module.vpc_sa.vpc_id
+  source              = "./modules/subnet"
+  providers           = { aws = aws.saeast }
+  vpc_id             = module.vpc_sa.vpc_id
+  region             = "sa-east-1"
+  cidr_block_a       = "10.1.1.0/24"
+  cidr_block_c       = "10.1.2.0/24"
+  availability_zone_a = "sa-east-1a"
+  availability_zone_c = "sa-east-1c"
 }
 
 # Módulos de Security Group
 module "sg_us" {
-  source    = "./modules/security_group"
-  providers = { aws = aws.useast }
-  vpc_id    = module.vpc_us.vpc_id
+  source              = "./modules/security_group"
+  providers           = { aws = aws.useast }
+  region             = "us-east-1"
+  vpc_id             = module.vpc_us.vpc_id
+  security_group_name = "allow_ssh_ping_us"
+  ssh_cidr_blocks    = ["0.0.0.0/0"]
+  icmp_cidr_blocks   = ["0.0.0.0/0"]
 }
 
 module "sg_sa" {
-  source    = "./modules/security_group"
-  providers = { aws = aws.saeast }
-  vpc_id    = module.vpc_sa.vpc_id
+  source              = "./modules/security_group"
+  providers           = { aws = aws.saeast }
+  region             = "sa-east-1"
+  vpc_id             = module.vpc_sa.vpc_id
+  security_group_name = "allow_ssh_ping_sa"
+  ssh_cidr_blocks    = ["0.0.0.0/0"]
+  icmp_cidr_blocks   = ["0.0.0.0/0"]
 }
+
 
 # Módulos de EC2 Instances
 module "ec2_instance_us_a" {
   source        = "./modules/ec2_instance"
   providers     = { aws = aws.useast }
-  ami_id        = var.regions["us-east-1"]
+  ami_id        = var.ami_ids["us-east-1"]  # Atualizado para usar uma variável de AMI
   instance_type = "t2.micro"
   subnet_id     = module.subnet_us.subnet_id
   security_group_ids = [module.sg_us.sg_id]
@@ -78,7 +99,7 @@ module "ec2_instance_us_a" {
 module "ec2_instance_us_c" {
   source        = "./modules/ec2_instance"
   providers     = { aws = aws.useast }
-  ami_id        = var.regions["us-east-1"]
+  ami_id        = var.ami_ids["us-east-1"]  # Atualizado para usar uma variável de AMI
   instance_type = "t2.micro"
   subnet_id     = module.subnet_us.subnet_id
   security_group_ids = [module.sg_us.sg_id]
@@ -87,7 +108,7 @@ module "ec2_instance_us_c" {
 module "ec2_instance_sa_a" {
   source        = "./modules/ec2_instance"
   providers     = { aws = aws.saeast }
-  ami_id        = var.regions["sa-east-1"]
+  ami_id        = var.ami_ids["sa-east-1"]  # Atualizado para usar uma variável de AMI
   instance_type = "t2.micro"
   subnet_id     = module.subnet_sa.subnet_id
   security_group_ids = [module.sg_sa.sg_id]
@@ -96,7 +117,7 @@ module "ec2_instance_sa_a" {
 module "ec2_instance_sa_c" {
   source        = "./modules/ec2_instance"
   providers     = { aws = aws.saeast }
-  ami_id        = var.regions["sa-east-1"]
+  ami_id        = var.ami_ids["sa-east-1"]  # Atualizado para usar uma variável de AMI
   instance_type = "t2.micro"
   subnet_id     = module.subnet_sa.subnet_id
   security_group_ids = [module.sg_sa.sg_id]

@@ -7,10 +7,11 @@ variable "regions" {
 }
 
 variable "vpc_cidr" {
-  type = map(string)
+  description = "CIDR blocks for the VPCs in different regions"
+  type        = map(string)
   default = {
-    us-east-1 = "10.0.0.0/16"
-    sa-east-1 = "10.1.0.0/16"
+    "us-east-1" = "10.0.0.0/16"
+    "sa-east-1" = "10.1.0.0/16"
   }
 }
 
@@ -35,3 +36,13 @@ variable "availability_zones" {
     sa-east-1 = ["sa-east-1a", "sa-east-1c"]
   }
 }
+
+variable "ami_ids" {
+  description = "Map of AMI IDs for each region"
+  type = map(string)
+  default = {
+    "us-east-1" = "ami-0c55b159cbfafe1f0"  # Exemplo de AMI para us-east-1
+    "sa-east-1" = "ami-0c55b159cbfafe1f0"  # Exemplo de AMI para sa-east-1
+  }
+}
+
