@@ -1,8 +1,8 @@
 variable "regions" {
   type = map(string)
   default = {
-    us-east-1 = "ami-12345678"
-    sa-east-1 = "ami-87654321"
+    us-east-1 = "ami-02e136e904f3da870"
+    sa-east-1 = "ami-09bc0685970d93c8d"
   }
 }
 
