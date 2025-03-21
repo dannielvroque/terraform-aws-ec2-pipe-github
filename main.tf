@@ -142,20 +142,3 @@ output "instance_ips" {
     sa-east-1c = aws_instance.sa_c.public_ip
   }
 }
-
-# Criação do bucket S3 com um nome único
-resource "aws_s3_bucket" "terraform_state" {
-  bucket = "s3-tfsate-danniel-unique123"  # Nome exclusivo para o bucket
-  # Remover o ACL explicitamente, o Terraform irá gerenciar isso automaticamente
-  force_destroy = true  # Adicione isso caso você precise excluir o bucket posteriormente sem preocupações com objetos dentro dele
-}
-
-
-terraform {
-  backend "s3" {
-    bucket = "s3-tfsate-danniel-unique123"  # Nome exclusivo do bucket
-    key    = "terraform.tfstate"
-    region = "us-east-1"
-    encrypt = true
-  }
-}
