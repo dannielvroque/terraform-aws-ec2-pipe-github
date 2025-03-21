@@ -31,6 +31,6 @@ jobs:
       - name: Validar Terraform
         run: terraform validate
 
-      - name: Aplicar Terraform (com aprovação manual)
+      - name: Aplicar Terraform
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
