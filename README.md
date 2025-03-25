@@ -127,7 +127,7 @@ Se tiver dúvidas ou sugestões, **abra uma issue** ou entre em contato! 🚀
 ### **Como funciona o botão de Destroy?**
 O botão de **destroy** é um workflow configurado no **GitHub Actions**. Para isso, é necessário o arquivo `destroy.yml` dentro do diretório `.github/workflows/`, conforme o exemplo abaixo:
 
-📌 **`.github/workflows/apply.yml`**
+📌 **`.github/workflows/terraform-ci.yml`**
 
 ```yaml
 name: Destroy Infrastructure
