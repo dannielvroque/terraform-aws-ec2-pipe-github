@@ -137,26 +137,32 @@ on:
   workflow_dispatch:  # Permite rodar manualmente pelo GitHub Actions
 
 jobs:
-  destroy:
+    terraform_destroy:
+    name: Terraform Destroy
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # Só rodar o destroy se for disparado manualmente
+
     steps:
-      - name: Checkout do código
+        - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Configurar AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        - name: Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1
 
-      - name: Instalar Terraform
+        - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Inicializar Terraform
+        - name: Inicializar Terraform
         run: terraform init
 
-      - name: Executar Terraform Destroy
+        - name: Validar Terraform
+        run: terraform validate
+
+        - name: Destruir recursos em SA e US
         run: terraform destroy -auto-approve
 ```
 
