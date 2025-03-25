@@ -101,7 +101,7 @@ Se quiser remover os recursos criados, o GitHub Actions possui um botão para **
 
 Clique no botão abaixo para executar o workflow de **destroy**:
 
-[![Destruir Infraestrutura](https://github.com/dannielvroque/terraform-aws-ec2-pipe-github/actions/workflows/destroy.yml/badge.svg)](https://github.com/dannielvroque/terraform-aws-ec2-pipe-github/actions/workflows/destroy.yml)
+[![Destruir Infraestrutura](https://github.com/dannielvroque/terraform-aws-ec2-pipe-github/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/dannielvroque/terraform-aws-ec2-pipe-github/actions/workflows/terraform-ci.yml)
 
 Ou execute manualmente o comando:
 
