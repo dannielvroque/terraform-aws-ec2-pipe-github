@@ -32,7 +32,6 @@ Este repositório contém um código **Terraform** para criar **duas instâncias
 ```bash
 terraform-aws-ec2-pipe-github/
 │── .github/workflows/terraform-ci.yml   # Pipeline de deploy no GitHub Actions
-│── .github/workflows/destroy.yml       # Pipeline para destruir a infraestrutura
 │── main.tf                              # Código Terraform principal
 │── variables.tf                         # Variáveis do Terraform
 │── outputs.tf                           # Saídas do Terraform
@@ -128,7 +127,7 @@ Se tiver dúvidas ou sugestões, **abra uma issue** ou entre em contato! 🚀
 ### **Como funciona o botão de Destroy?**
 O botão de **destroy** é um workflow configurado no **GitHub Actions**. Para isso, é necessário o arquivo `destroy.yml` dentro do diretório `.github/workflows/`, conforme o exemplo abaixo:
 
-📌 **`.github/workflows/destroy.yml`**
+📌 **`.github/workflows/apply.yml`**
 
 ```yaml
 name: Destroy Infrastructure
@@ -143,26 +142,26 @@ jobs:
     if: github.event_name == 'workflow_dispatch'  # Só rodar o destroy se for disparado manualmente
 
     steps:
-        - name: Checkout do código
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-        - name: Configurar AWS Credentials
+      - name: Configurar AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-        - name: Instalar Terraform
+      - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
 
-        - name: Inicializar Terraform
+      - name: Inicializar Terraform
         run: terraform init
 
-        - name: Validar Terraform
+      - name: Validar Terraform
         run: terraform validate
 
-        - name: Destruir recursos em SA e US
+      - name: Destruir recursos em SA e US
         run: terraform destroy -auto-approve
 ```
 
