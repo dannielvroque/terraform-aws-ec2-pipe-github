@@ -164,5 +164,3 @@ Agora, o botão de **destroy** aparecerá no GitHub Actions, e você poderá **d
 ```
 
 ---
-
-Agora, você pode **copiar** e **colar** o conteúdo acima diretamente no seu arquivo `README.md` no seu repositório. Assim ele estará formatado corretamente para visualização no GitHub!
